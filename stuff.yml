@@ -1,0 +1,25 @@
+---
+- name: AWS role
+  ansible.builtin.import_role:
+    name: inqwise.common.aws
+  vars:
+    dns_record_list:
+    - name: "{{ private_dns }}.{{ private_domain }}"
+      zone: "{{ private_domain }}"
+      type: A
+      value: "{{ private_ip }}"
+      private: true
+      ttl: 120
+    tags_facts:
+      private_dns: "private_dns"
+      reload_index_recipients: "reload_index_recipients"
+
+- name: Java role
+  ansible.builtin.include_role:
+    name: inqwise.common.java
+  tags: install
+
+- name: Pension role 
+  ansible.builtin.import_role:
+    name: pension
+   

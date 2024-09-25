@@ -1,0 +1,236 @@
+{
+	"employee": {
+		"properties": {
+			"salary_period_id": {
+				"type": "integer"
+			},
+			"received_docs": {
+				"type": "nested",
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"report_type_id": {
+						"type": "short"
+					}
+				}
+			},
+			"sent_attachments": {
+				"type": "nested"
+			},
+			"received_provisions": {
+				"type": "nested"
+			},
+			"received_transactions": {
+				"type": "nested"
+			},
+			"sent_transactions": {
+				"type": "nested"
+			},
+			"fix_status_id": {
+				"type": "integer"
+			}
+		}
+	},
+	"compensation-employee": {
+		"properties": {
+			"companyPartName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"pfundKeyShort": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"allowanceTypeId": {
+				"type": "short"
+			},
+			"companyName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"pfundKey": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"employeeFirstName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"pfundSenderKey": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"compensationDate": {
+				"type": "date"
+			},
+			"companyPartId": {
+				"type": "integer"
+			},
+			"companyPortfolioId": {
+				"type": "long"
+			},
+			"companyKey": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"pfundSenderName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"pfundId": {
+				"type": "integer"
+			},
+			"pfundName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"periodId": {
+				"type": "long"
+			},
+			"amount": {
+				"type": "float"
+			},
+			"taxAmount": {
+				"type": "float"
+			},
+			"taxFreeAmount": {
+				"type": "float"
+			},
+			"subUniqueKey": {
+				"type": "keyword",
+				"index": true
+			},
+			"accountantKey": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"parentTypeId": {
+				"type": "short"
+			},
+			"uniqueKey": {
+				"type": "keyword",
+				"index": true
+			},
+			"employeeKey": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"lastDepositDate": {
+				"type": "date"
+			},
+			"userId": {
+				"type": "long"
+			},	
+			"modelCreateDate": {
+				"type": "date"
+			},
+			"productTypeId": {
+				"type": "short"
+			},
+			"accountantId": {
+				"type": "integer"
+			},
+			"companyId": {
+				"type": "integer"
+			},
+			"employeeKeyTypeId": {
+				"type": "short"
+			},
+			"employeeLastName": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"policyId": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			},
+			"employerAccumulationDate": {
+				"type": "date"
+			},
+			"firstDepositDate": {
+				"type": "date"
+			},
+			"parentBalanceDate": {
+				"type": "date"
+			},
+			"pfundPortfolioId": {
+				"type": "long"
+			},
+			"filename": {
+				"type": "text",
+				"fields": {
+					"keyword": {
+						"ignore_above": 256,
+						"type": "keyword"
+					}
+				}
+			}
+		}
+	}
+}

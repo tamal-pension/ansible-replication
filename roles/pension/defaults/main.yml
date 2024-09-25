@@ -1,0 +1,82 @@
+---
+
+app_name: pension-rep
+app_description: pension application
+app_home: "/data/pension"
+app_logs_path: "{{ app_home }}/logs"
+app_bin_path: "{{ app_home }}/bin"
+app_lib_path: "{{ app_home }}/lib"
+app_config_path: "{{ app_home }}/config"
+app_resources_path: "{{ app_lib_path }}"
+app_service_name: "{{ app_name }}"
+app_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
+
+app_configurations:
+  replication.http.port: 8080
+
+  dao:
+    main:
+      url: "{{ app_dao_main.url }}"
+      driver_class: "com.mysql.cj.jdbc.Driver"
+      user: "{{ app_dao_main.user }}"
+      password: "{{ app_dao_main.password }}"
+    control:
+      url: "{{ app_dao_control.url }}"
+      driver_class: "com.mysql.cj.jdbc.Driver"
+      user: "{{ app_dao_control.user }}"
+      password: "{{ app_dao_control.password }}"
+
+  security: "{{ app_security }}"
+
+  protected_users_list: "{{ app_admin_tamal_excluded_users }}"
+
+  destination-base-path: "s3:///"
+  files-path: "/replication-{{ environment_name }}/rep-files"
+  store_files_as_avro: true
+  reload_folder_bulk_size: 50
+  reload_index_recipients: "manager@{{ app_public_domain }}"
+  email_subject_prefix: "pension:rep:"
+  store_employee_at_es: true
+  store_doc_at_es: true
+  execute_interval_in_millis: 300000
+  execute_delay_interval_in_millis: 300000
+  autostart_execute_data: true
+  index_circuit_breaker_config:
+    maxFailures: 50
+    timeout: 60000
+    fallbackOnFailure: true
+    resetTimeout: 10000
+    maxRetries: 30
+
+  mail: "{{ app_email }}"
+
+  cache:
+    type: "redis"
+    datasource:
+      host: "redis.{{ private_domain }}"
+      select: 5
+    ttl: 120
+
+  events:
+    destination-base-path: "s3:///"
+    files-path: "/replication-{{ environment_name }}/rep-files"
+
+  events_bulk_size: 1000
+
+  elasticindexer:
+    dao:
+      url: "{{ app_dao_elasticindexer.url }}"
+      driver_class: "com.mysql.cj.jdbc.Driver"
+      user: "{{ app_dao_elasticindexer.user }}"
+      password: "{{ app_dao_elasticindexer.password }}"
+
+    queue:
+      bootstrap.servers: "kafka1.{{ private_domain }}:9092;kafka2.{{ private_domain }}:9092;kafka3.{{ private_domain }}:9092"
+
+    hosts:
+      - "http://elastic-master1.{{ private_domain }}:9200"
+      - "http://elastic-master2.{{ private_domain }}:9200"
+
+    shards: 2
+    replicas: 1
+    index_actions_queue_name: "pension_elastic_inx__actions"
