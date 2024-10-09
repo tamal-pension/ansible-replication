@@ -1,7 +1,7 @@
 ---
 - name: Health check api admin
   ansible.builtin.uri:
-    url: "http://localhost:{{ app_configurations.replication.http.port }}/healthcheck"
+    url: "http://localhost:{{ app_configurations['replication.http.port'] }}/healthcheck"
     follow_redirects: none
     method: GET
   register: _result
