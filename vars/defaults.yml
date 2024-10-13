@@ -13,7 +13,8 @@ users:
     group: "{{ app_group }}"
     append: true
     create_home: false
-    system: true
+    shell: /sbin/nologin
 consul_template_service_start_and_enable: false
 consul_service_start_and_enable: false
 aws_iam_role: "replication-role"
+loki_base_url: "http://loki.{{ private_domain }}:3100"
