@@ -1,0 +1,9 @@
+---
+
+- name: Restart logstash
+  ansible.builtin.service:
+    name: logstash
+    state: restarted
+    enabled: true
+  listen: restart logstash
+  when: logstash_service_start_and_enable

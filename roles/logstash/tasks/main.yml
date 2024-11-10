@@ -1,0 +1,38 @@
+---
+- name: Setup
+  ansible.builtin.import_tasks: setup.yml
+
+- name: Create application folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "logstash"
+    group: "logstash"
+    mode: "10774"
+  loop:
+    - "{{ logstash_last_run_metadata_basepath }}"
+    - "{{ logstash_last_run_metadata_basepath }}/companies_parts"
+    - "{{ logstash_last_run_metadata_basepath }}/pension_funds"
+    - "{{ logstash_last_run_metadata_basepath }}/tamal_statistics"
+    - "{{ logstash_last_run_metadata_basepath }}/companies"
+    - "{{ logstash_last_run_statement_basepath }}/companies_parts"
+    - "{{ logstash_last_run_statement_basepath }}/pension_funds"
+    - "{{ logstash_last_run_statement_basepath }}/tamal_statistics"
+    - "{{ logstash_last_run_statement_basepath }}/companies"
+  tags: configuration
+
+- name: Plugins
+  ansible.builtin.import_tasks: plugins.yml
+
+- name: Mysql Connector
+  ansible.builtin.import_tasks: mysql_connector.yml
+
+- name: Config
+  ansible.builtin.import_tasks: config.yml
+
+- name: Ensure Logstash is started and enabled on boot.
+  ansible.builtin.service:
+    name: logstash
+    state: started
+    enabled: "{{ logstash_enabled_on_boot }}"
+  tags: configuration

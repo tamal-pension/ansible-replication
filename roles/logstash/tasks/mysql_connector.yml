@@ -1,0 +1,16 @@
+---
+
+- name: Download JDBC connector from http
+  ansible.builtin.get_url:
+    dest: "{{ logstash_jdbc_driver_library }}"
+    url: "{{ logstash_jdbc_driver_jar_url }}"
+    mode: "0750"
+    validate_certs: false
+    force: false
+  when: logstash_jdbc_driver_jar_url.startswith("http")
+  tags: installation
+
+- name: Download JDBC connector from http
+  ansible.builtin.command: "aws s3 cp {{ logstash_jdbc_driver_jar_url }} {{ logstash_jdbc_driver_library }}"
+  when: logstash_jdbc_driver_jar_url.startswith("s3")
+  tags: configuration

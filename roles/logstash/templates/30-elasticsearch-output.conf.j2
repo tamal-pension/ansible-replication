@@ -1,0 +1,35 @@
+output {
+  if "cp_tag" in [tags] {
+    elasticsearch {
+      hosts => {{ logstash_elasticsearch_hosts | to_json }}
+      index => "company-part"
+      document_id => "%{company_part_id}"
+      document_type => "company_part"
+      template => "{{ logstash_last_run_statement_basepath }}/global_tempalte.json"
+    }
+  } else if "pf_tag" in [tags]{
+    elasticsearch {
+      hosts => {{ logstash_elasticsearch_hosts | to_json }}
+      index => "pension-fund"
+      document_id => "%{pfund_id}"
+      document_type => "pension_fund"
+      template => "{{ logstash_last_run_statement_basepath }}/global_tempalte.json"
+    }
+  } else if "ts_tag" in [tags]{
+    elasticsearch {
+      hosts => {{ logstash_elasticsearch_hosts | to_json }}
+      index => "tamal_stts-%{ts_year}"
+      document_id => "%{tm_id}"
+      document_type => "tamal_statistic"
+      template => "{{ logstash_last_run_statement_basepath }}/global_tempalte.json"
+    }
+  } else if "company_tag" in [tags]{
+    elasticsearch {
+      hosts => {{ logstash_elasticsearch_hosts | to_json }}
+      index => "company"
+      document_id => "%{company_id}"
+      document_type => "company"
+      template => "{{ logstash_last_run_statement_basepath }}/global_tempalte.json"
+    }
+  } 
+}

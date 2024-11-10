@@ -1,0 +1,25 @@
+---
+logstash_version: '7.x'
+
+logstash_package: logstash
+
+logstash_elasticsearch_hosts:
+  - http://localhost:9200
+
+logstash_dir: /usr/share/logstash
+
+logstash_enabled_on_boot: true
+
+logstash_install_plugins:
+  - logstash-integration-jdbc
+
+logstash_setup_default_config: true
+
+logstash_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
+
+logstash_last_run_metadata_basepath: "/tmp/logstash/metadata"
+logstash_last_run_statement_basepath: "/tmp/logstash/statement"
+logstash_jdbc_driver_class: "com.mysql.cj.jdbc.Driver"
+
+logstash_jdbc_driver_jar_url: "s3://resource-{{ environment_name }}/mysql-connector-java.jar"
+logstash_jdbc_driver_library: "{{ logstash_dir }}/mysql-connector-java.jar"

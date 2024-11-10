@@ -10,6 +10,7 @@ app_config_path: "{{ app_home }}/config"
 app_resources_path: "{{ app_lib_path }}"
 app_service_name: "{{ app_name }}"
 app_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
+app_autostart_execute_data: true
 
 app_configurations:
   replication.http.port: 8080
@@ -40,7 +41,7 @@ app_configurations:
   store_doc_at_es: true
   execute_interval_in_millis: 300000
   execute_delay_interval_in_millis: 300000
-  autostart_execute_data: true
+  autostart_execute_data: "autostart_execute_data"
   index_circuit_breaker_config:
     maxFailures: 50
     timeout: 60000
@@ -76,6 +77,7 @@ app_configurations:
     hosts:
       - "http://elastic-master1.{{ private_domain }}:9200"
       - "http://elastic-master2.{{ private_domain }}:9200"
+      - "http://elastic-master3.{{ private_domain }}:9200"
 
     shards: 2
     replicas: 1

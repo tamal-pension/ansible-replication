@@ -1,0 +1,16 @@
+input {
+  jdbc {
+    jdbc_driver_library => "{{ logstash_jdbc_driver_library }}"
+    jdbc_driver_class => "{{ logstash_jdbc_driver_class }}"
+    jdbc_connection_string => "{{ logstash_jdbc_connection_string }}"
+    jdbc_user => "{{ logstash_jdbc_user }}"
+    jdbc_password => "{{ logstash_jdbc_password }}"
+    schedule => "{{ logstash_schedule }}"
+    last_run_metadata_path => "{{ logstash_last_run_metadata_basepath }}/companies/.cp_migrate_last_run"
+    statement_filepath => "{{ logstash_last_run_statement_basepath }}/companies.sql"
+    jdbc_fetch_size => 1000
+    use_column_value => true
+    tracking_column => "company_id"
+    tags => "company_tag"
+  }
+}
