@@ -41,7 +41,7 @@ app_configurations:
   store_doc_at_es: true
   execute_interval_in_millis: 300000
   execute_delay_interval_in_millis: 300000
-  autostart_execute_data: "autostart_execute_data"
+  autostart_execute_data: "{{ autostart_execute_data }}"
   index_circuit_breaker_config:
     maxFailures: 50
     timeout: 60000
