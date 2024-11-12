@@ -4,44 +4,32 @@ output {
       hosts => {{ logstash_elasticsearch_hosts | to_json }}
       index => "company-part"
       document_id => "%{company_part_id}"
-      template => "{{ logstash_last_run_statement_basepath }}/global_template.json"
-      template_name => "company_part_template"
-      template_overwrite => true
-      retry_count => 3
-      retry_max_interval => 10
+      manage_template => false
     }
   } else if "pf_tag" in [tags] {
     elasticsearch {
       hosts => {{ logstash_elasticsearch_hosts | to_json }}
       index => "pension-fund"
       document_id => "%{pfund_id}"
-      template => "{{ logstash_last_run_statement_basepath }}/global_template.json"
-      template_name => "pension_fund_template"
-      template_overwrite => true
-      retry_count => 3
-      retry_max_interval => 10
+      manage_template => false
     }
   } else if "ts_tag" in [tags] {
     elasticsearch {
       hosts => {{ logstash_elasticsearch_hosts | to_json }}
-      index => "tamal_stats-%{ts_year}"  # Ensure 'stats' is correct; adjust if necessary
+      index => "tamal_stts-%{ts_year}"
       document_id => "%{tm_id}"
-      template => "{{ logstash_last_run_statement_basepath }}/global_template.json"
-      template_name => "tamal_statistic_template"
-      template_overwrite => true
-      retry_count => 3
-      retry_max_interval => 10
+      manage_template => false
     }
   } else if "company_tag" in [tags] {
     elasticsearch {
       hosts => {{ logstash_elasticsearch_hosts | to_json }}
       index => "company"
       document_id => "%{company_id}"
-      template => "{{ logstash_last_run_statement_basepath }}/global_template.json"
-      template_name => "company_template"
-      template_overwrite => true
-      retry_count => 3
-      retry_max_interval => 10
+      manage_template => false
     }
+  }
+
+  if "index_creation_failed" in [tags] {
+    stdout { codec => rubydebug }
   }
 }

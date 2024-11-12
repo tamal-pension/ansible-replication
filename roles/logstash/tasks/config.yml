@@ -8,6 +8,7 @@
     group: root
     mode: 0644
   with_items:
+    - 00-create_index-input.conf
     - 01-companies_parts-input.conf
     - 02-pension_funds-input.conf
     - 03-tamal_statistics-input.conf

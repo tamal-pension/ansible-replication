@@ -1,0 +1,125 @@
+filter {
+  # Ruby filter to determine and create index based on event tags
+  ruby {
+    code => '
+      require "net/http"
+      require "uri"
+      require "json"
+
+      # Initialize a class variable for caching created indices
+      unless defined?(@@created_indices)
+        @@created_indices = {}
+      end
+
+      # Determine the target index based on tags
+      index = nil  # No default index initially
+
+      if event.get("tags").include?("cp_tag")
+        index = "company-part"
+      elsif event.get("tags").include?("pf_tag")
+        index = "pension-fund"
+      elsif event.get("tags").include?("ts_tag")
+        ts_year = event.get("ts_year") || Time.now.year
+        index = "tamal_stats-#{ts_year}"
+      elsif event.get("tags").include?("company_tag")
+        index = "company"
+      end
+
+      # Set the detected index in a new field for output usage
+      if index
+        event.set("detected_index", index)
+      else
+        # Optionally, tag events without a matching index
+        event.tag("no_matching_tag")
+      end
+
+      # Proceed only if an index was determined
+      if index
+        unless @@created_indices[index]
+          # Access Ansible-substituted variables
+          elasticsearch_hosts = ["elastic1.example.com:9200", "elastic2.example.com:9200"]
+          last_run_basepath = "/tmp/logstash/statement"
+
+          # Validate 'logstash_elasticsearch_hosts'
+          if elasticsearch_hosts.nil? || elasticsearch_hosts.empty?
+            event.tag("elasticsearch_host_missing")
+            event.set("elasticsearch_host_error", "logstash_elasticsearch_hosts is missing or empty")
+            return
+          end
+
+          # Extract 'es_host' by splitting the first host with ':' and taking the left part
+          es_host = elasticsearch_hosts[0].split(':')[0]
+
+          # Validate 'logstash_last_run_statement_basepath'
+          if last_run_basepath.nil? || last_run_basepath.empty?
+            event.tag("template_path_missing")
+            event.set("template_path_error", "logstash_last_run_statement_basepath is missing or empty")
+            return
+          end
+
+          # Define the template path
+          template_path = "#{last_run_basepath}/global_template.json"
+
+          # Create URI for index existence check
+          uri = URI.parse("http://#{es_host}:9200/#{index}")
+
+          # Initialize HTTP connection
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.read_timeout = 5  # seconds
+
+          # Check if index exists
+          request = Net::HTTP::Head.new(uri.request_uri)
+          response = http.request(request)
+
+          if response.code.to_i == 404
+            # Index does not exist; create it using the template
+
+            # Read the template file
+            begin
+              template_file = File.read(template_path)
+              template_json = JSON.parse(template_file)
+
+              # Extract only "settings" and "mappings" from the template
+              settings = template_json["settings"] || {}
+              mappings = template_json["mappings"] || {}
+
+              # Construct the index creation body
+              index_body = {
+                "settings" => settings,
+                "mappings" => mappings
+              }
+
+              # Convert index body to JSON
+              index_body_json = index_body.to_json
+
+              # Create the index
+              create_request = Net::HTTP::Put.new(uri.request_uri)
+              create_request["Content-Type"] = "application/json"
+              create_request.body = index_body_json
+
+              create_response = http.request(create_request)
+
+              if create_response.code.to_i != 200 && create_response.code.to_i != 201
+                # Log an error if index creation fails
+                event.tag("index_creation_failed")
+                event.set("index_creation_error", create_response.body)
+              else
+                # Mark index as created
+                @@created_indices[index] = true
+                event.tag("index_created")
+              end
+            rescue => e
+              # Handle exceptions during index creation
+              event.tag("index_creation_failed")
+              event.set("index_creation_error", e.message)
+            end
+          else
+            # Index exists; mark as created
+            @@created_indices[index] = true
+          end
+        end
+      end
+    '
+    add_tag => [ "ruby_filter_processed" ]
+  }
+}
