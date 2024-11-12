@@ -49,6 +49,7 @@
     alloy_user_groups:
       - systemd-journal
       - "{{ app_group }}"
+      - logstash
     config: |
       loki.write "local" {
         endpoint {
@@ -85,23 +86,66 @@
         }
       }
    
-      local.file_match "local_files" {
+      local.file_match "pension_log_files" {
         path_targets = [{"__path__" = "/data/pension/logs/*.log"}]
         sync_period = "10s"
       }
 
-      loki.source.file "log_scrape" {
-        targets    = local.file_match.local_files.targets
-        forward_to = [loki.process.filter_logs.receiver]
+      loki.source.file "pension_log_files_scrape" {
+        targets    = local.file_match.pension_log_files.targets
+        forward_to = [loki.process.pension_log_files_filter.receiver]
         tail_from_end = true
       }
-      loki.process "filter_logs" {
+
+      loki.process "pension_log_files_filter" {
         stage.multiline {
           firstline = "^(?P<timestamp>[0-9\\-]{10} [0-9:]{8},[0-9]{3}) (?P<level>[^ ]+)"
         }
         stage.regex {
           expression = "^(?P<timestamp>[0-9\\-]{10} [0-9:]{8},[0-9]{3}) (?P<level>[^ ]+) (?P<logger>[^ ]+) \\[(?P<thread>[^\\]]+)\\] (?P<message>.*)$"
         }
+        stage.labels {
+          values = {
+            "level" = "level",
+            "logger" = "logger",
+            "timestamp" = "timestamp",
+          }
+        }
+        stage.static_labels {
+          values = {
+            "app" = "{{ app_name }}",
+            "unit"= "{{ app_name }}.service",
+          }
+        }
+        forward_to = [
+          loki.write.local.receiver,
+        ]
+      }
+
+
+
+
+
+
+      local.file_match "logstash_files" {
+        path_targets = [{"__path__" = "/var/log/logstash/logstash-plain.log"}]
+        sync_period = "10s"
+      }
+
+      loki.source.file "logstash_files_scrape" {
+        targets    = local.file_match.logstash_files.targets
+        forward_to = [loki.process.logstash_files_filter.receiver]
+        tail_from_end = true
+      }
+
+      loki.process "logstash_files_filter" {
+        stage.multiline {
+          firstline = "^\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2},\\d{3})\\]"
+        }
+        stage.regex {
+          expression = "^\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2},\\d{3})\\]\\[(?P<level>[A-Z]+)\\]\\[(?P<logger>[^\\]]+)\\]\\s(?P<message>.+)"
+        }
+
         stage.labels {
           values = {
             "level" = "level",
