@@ -10,7 +10,6 @@ users:
     group: "{{ app_group }}"
     append: true
     create_home: false
-    shell: /sbin/nologin
 consul_template_service_start_and_enable: false
 consul_service_start_and_enable: false
 aws_iam_role: "replication-role"
