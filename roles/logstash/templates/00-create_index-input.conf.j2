@@ -35,14 +35,13 @@ filter {
       # Proceed only if the index has not been created/checked before
       unless @@created_indices[index]
         # Define Elasticsearch host and port
-        es_host = "{{ logstash_elasticsearch_hosts[0].split(':')[0] }}"
-        es_port = 9200
+        es_url = "{{ logstash_elasticsearch_hosts[0] }}"
 
         # Define the template path
         template_path = "{{ logstash_last_run_statement_basepath }}/global_template.json"
 
         # Create URI for index existence check
-        uri = URI.parse("http://#{es_host}:#{es_port}/#{index}")
+        uri = URI.parse("#{es_url}/#{index}")
 
         # Initialize HTTP connection
         http = Net::HTTP.new(uri.host, uri.port)
