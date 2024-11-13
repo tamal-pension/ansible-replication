@@ -29,94 +29,74 @@ filter {
       if index
         event.set("detected_index", index)
       else
-        # Optionally, tag events without a matching index
-        event.tag("no_matching_tag")
+        event.set("detected_index", "default-index")
       end
 
-      # Proceed only if an index was determined
-      if index
-        unless @@created_indices[index]
-          # Access Ansible-substituted variables
-          elasticsearch_hosts = ["elastic1.example.com:9200", "elastic2.example.com:9200"]
-          last_run_basepath = "/tmp/logstash/statement"
+      # Proceed only if the index has not been created/checked before
+      unless @@created_indices[index]
+        # Define Elasticsearch host and port
+        es_host = "{{ logstash_elasticsearch_hosts[0].split(':')[0] }}"
+        es_port = 9200
 
-          # Validate 'logstash_elasticsearch_hosts'
-          if elasticsearch_hosts.nil? || elasticsearch_hosts.empty?
-            event.tag("elasticsearch_host_missing")
-            event.set("elasticsearch_host_error", "logstash_elasticsearch_hosts is missing or empty")
-            return
-          end
+        # Define the template path
+        template_path = "{{ logstash_last_run_statement_basepath }}/global_template.json"
 
-          # Extract 'es_host' by splitting the first host with ':' and taking the left part
-          es_host = elasticsearch_hosts[0].split(':')[0]
+        # Create URI for index existence check
+        uri = URI.parse("http://#{es_host}:#{es_port}/#{index}")
 
-          # Validate 'logstash_last_run_statement_basepath'
-          if last_run_basepath.nil? || last_run_basepath.empty?
-            event.tag("template_path_missing")
-            event.set("template_path_error", "logstash_last_run_statement_basepath is missing or empty")
-            return
-          end
+        # Initialize HTTP connection
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.read_timeout = 5  # seconds
 
-          # Define the template path
-          template_path = "#{last_run_basepath}/global_template.json"
+        # Check if index exists
+        request = Net::HTTP::Head.new(uri.request_uri)
+        response = http.request(request)
 
-          # Create URI for index existence check
-          uri = URI.parse("http://#{es_host}:9200/#{index}")
+        if response.code.to_i == 404
+          # Index does not exist; create it using the template
 
-          # Initialize HTTP connection
-          http = Net::HTTP.new(uri.host, uri.port)
-          http.read_timeout = 5  # seconds
+          # Read the template file
+          begin
+            template_file = File.read(template_path)
+            template_json = JSON.parse(template_file)
 
-          # Check if index exists
-          request = Net::HTTP::Head.new(uri.request_uri)
-          response = http.request(request)
+            # Extract only "settings" and "mappings" from the template
+            settings = template_json["settings"] || {}
+            mappings = template_json["mappings"] || {}
 
-          if response.code.to_i == 404
-            # Index does not exist; create it using the template
+            # Construct the index creation body
+            index_body = {
+              "settings" => settings,
+              "mappings" => mappings
+            }
 
-            # Read the template file
-            begin
-              template_file = File.read(template_path)
-              template_json = JSON.parse(template_file)
+            # Convert index body to JSON
+            index_body_json = index_body.to_json
 
-              # Extract only "settings" and "mappings" from the template
-              settings = template_json["settings"] || {}
-              mappings = template_json["mappings"] || {}
+            # Create the index
+            create_request = Net::HTTP::Put.new(uri.request_uri)
+            create_request["Content-Type"] = "application/json"
+            create_request.body = index_body_json
 
-              # Construct the index creation body
-              index_body = {
-                "settings" => settings,
-                "mappings" => mappings
-              }
+            create_response = http.request(create_request)
 
-              # Convert index body to JSON
-              index_body_json = index_body.to_json
-
-              # Create the index
-              create_request = Net::HTTP::Put.new(uri.request_uri)
-              create_request["Content-Type"] = "application/json"
-              create_request.body = index_body_json
-
-              create_response = http.request(create_request)
-
-              if create_response.code.to_i != 200 && create_response.code.to_i != 201
-                # Log an error if index creation fails
-                event.tag("index_creation_failed")
-                event.set("index_creation_error", create_response.body)
-              else
-                # Mark index as created
-                @@created_indices[index] = true
-                event.tag("index_created")
-              end
-            rescue => e
-              # Handle exceptions during index creation
+            if create_response.code.to_i != 200 && create_response.code.to_i != 201
+              # Log an error if index creation fails
               event.tag("index_creation_failed")
-              event.set("index_creation_error", e.message)
+              event.set("index_creation_error", create_response.body)
+            else
+              # Mark index as created
+              @@created_indices[index] = true
+              event.tag("index_created")
             end
-          else
-            # Index exists; mark as created
-            @@created_indices[index] = true
+          rescue => e
+            # Handle exceptions during index creation
+            event.tag("index_creation_failed")
+            event.set("index_creation_error", e.message)
           end
+        else
+          # Index exists; mark as created
+          @@created_indices[index] = true
         end
       end
     '

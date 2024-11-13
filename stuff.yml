@@ -113,8 +113,8 @@
         }
         stage.static_labels {
           values = {
-            "app" = "{{ app_name }}",
-            "unit"= "{{ app_name }}.service",
+            "app" = "pension-replication",
+            "unit"= "pension-replication.service",
           }
         }
         forward_to = [
@@ -155,8 +155,8 @@
         }
         stage.static_labels {
           values = {
-            "app" = "{{ app_name }}",
-            "unit"= "{{ app_name }}.service",
+            "app" = "pension-replication",
+            "unit"= "logstash.service",
           }
         }
         forward_to = [
