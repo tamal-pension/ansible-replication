@@ -81,4 +81,6 @@ app_configurations:
 
     shards: 2
     replicas: 1
+    num_of_partitions: 4
+    wait_for_start: true
     index_actions_queue_name: "pension_elastic_inx__actions"
