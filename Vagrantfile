@@ -58,7 +58,8 @@ Vagrant.configure("2") do |config|
       version: "latest",
       app: "pension-replication",
       private_dns: "pension-replication-test-#{Etc.getpwuid(Process.uid).name}",
-      replication_active: "false"
+      replication_active: "false",
+      logstash_enable: "false"
     }
   end
 end

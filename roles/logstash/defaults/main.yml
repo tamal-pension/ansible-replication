@@ -8,7 +8,7 @@ logstash_elasticsearch_hosts:
 
 logstash_dir: /usr/share/logstash
 
-logstash_enabled_on_boot: true
+logstash_enabled_on_boot: false
 
 logstash_install_plugins:
   - logstash-integration-jdbc
