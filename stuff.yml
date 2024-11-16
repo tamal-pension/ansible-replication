@@ -34,7 +34,6 @@
     alloy_user_groups:
       - systemd-journal
       - "{{ app_group }}"
-      - logstash
     config: |
       loki.write "local" {
         endpoint {
@@ -100,48 +99,6 @@
           values = {
             "app" = "pension-replication",
             "unit"= "pension-replication.service",
-          }
-        }
-        forward_to = [
-          loki.write.local.receiver,
-        ]
-      }
-
-
-
-
-
-
-      local.file_match "logstash_files" {
-        path_targets = [{"__path__" = "/var/log/logstash/logstash-plain.log"}]
-        sync_period = "10s"
-      }
-
-      loki.source.file "logstash_files_scrape" {
-        targets    = local.file_match.logstash_files.targets
-        forward_to = [loki.process.logstash_files_filter.receiver]
-        tail_from_end = true
-      }
-
-      loki.process "logstash_files_filter" {
-        stage.multiline {
-          firstline = "^\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2},\\d{3})\\]"
-        }
-        stage.regex {
-          expression = "^\\[(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2},\\d{3})\\]\\[(?P<level>[A-Z]+)\\]\\[(?P<logger>[^\\]]+)\\]\\s(?P<message>.+)"
-        }
-
-        stage.labels {
-          values = {
-            "level" = "level",
-            "logger" = "logger",
-            "timestamp" = "timestamp",
-          }
-        }
-        stage.static_labels {
-          values = {
-            "app" = "pension-replication",
-            "unit"= "logstash.service",
           }
         }
         forward_to = [
