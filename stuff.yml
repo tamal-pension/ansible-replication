@@ -27,21 +27,6 @@
   vars:
     discord_webhook: "{{ discord_webhooks.apilog | default(discord_webhooks.default) }}"
 
-- name: Logstash role
-  ansible.builtin.import_role:
-    name: logstash
-  vars:
-    logstash_jdbc_connection_string: "{{ app_configurations.dao.main.url }}"
-    logstash_jdbc_user: "{{ app_configurations.dao.main.user }}"
-    logstash_jdbc_password: "{{ app_configurations.dao.main.password }}"
-    logstash_schedule: "*/5 * * * *"
-    logstash_install_plugins:
-      - logstash-integration-jdbc
-    logstash_elasticsearch_hosts:
-      - "http://elastic-master1.{{ private_domain }}:9200"
-      - "http://elastic-master2.{{ private_domain }}:9200"
-      - "http://elastic-master3.{{ private_domain }}:9200" 
-
 - name: Install Alloy
   ansible.builtin.include_role:
     name: alloy
