@@ -14,7 +14,6 @@
       private_dns: "private_dns"
       reload_index_recipients: "reload_index_recipients"
       replication_active: "app_autostart_execute_data"
-      logstash_enable: "logstash_service_start_and_enable"
 
 - name: Java role
   ansible.builtin.include_role:
