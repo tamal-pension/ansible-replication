@@ -85,3 +85,6 @@ app_configurations:
     replication_factor: 3
     wait_for_start: true
     index_actions_queue_name: "pension_elastic_inx__actions"
+
+hz_multicast_enabled: false
+hz_outbound_ports_range: 34000-34500

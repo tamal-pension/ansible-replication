@@ -14,6 +14,8 @@
       private_dns: "private_dns"
       reload_index_recipients: "reload_index_recipients"
       replication_active: "app_autostart_execute_data"
+      cluster_name: "cluster_name"
+      cluster_ports_range: "cluster_ports_range" 
 
 - name: Java role
   ansible.builtin.include_role:
@@ -25,6 +27,11 @@
     name: pension
   vars:
     discord_webhook: "{{ discord_webhooks.apilog | default(discord_webhooks.default) }}"
+    hz_outbound_ports_range: "{{ cluster_ports_range | default('34000-34500') }}"
+    hz_ec2:
+      tag_key: "cluster_name"
+      tag_value: "{{ cluster_name }}"
+      iam_role: "{{ aws_iam_role }}"
 
 - name: Install Alloy
   ansible.builtin.include_role:
