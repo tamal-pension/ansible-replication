@@ -35,6 +35,24 @@
   notify: restart pension
   tags: configuration
 
+- name: Download amazon.properties from remote server
+  ansible.builtin.get_url:
+    url: "{{ app_amazon_properties_remote_path }}"
+    dest: "{{ app_amazon_properties_local_path }}"
+    mode: '0640'
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    validate_certs: yes
+  register: download_amazon_properties
+  failed_when: false
+  tags: configuration
+
+- name: Log if amazon.properties not downloaded
+  ansible.builtin.debug:
+    msg: "amazon.properties not found on internal server."
+  when: download_amazon_properties.failed
+  tags: configuration
+
 - name: Change owner for lib
   ansible.builtin.file:
     path: "{{ app_lib_path }}"

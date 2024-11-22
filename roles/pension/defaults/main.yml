@@ -11,6 +11,9 @@ app_resources_path: "{{ app_lib_path }}"
 app_service_name: "{{ app_name }}"
 app_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
 app_autostart_execute_data: true
+app_amazon_properties_local_path: "{{ app_lib_path }}/amazon.properties"
+app_amazon_properties_remote_path: "{{ internal_base_url }}/replication/amazon.properties"
+ 
 
 app_configurations:
   replication.http.port: 8080
