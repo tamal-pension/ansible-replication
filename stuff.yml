@@ -15,7 +15,8 @@
       reload_index_recipients: "reload_index_recipients"
       replication_active: "app_autostart_execute_data"
       cluster_name: "cluster_name"
-      cluster_ports_range: "cluster_ports_range" 
+      cluster_ports_range: "cluster_ports_range"
+      webhook_key: "webhook_key"
 
 - name: Java role
   ansible.builtin.include_role:
@@ -26,7 +27,7 @@
   ansible.builtin.import_role:
     name: pension
   vars:
-    discord_webhook: "{{ discord_webhooks.apilog | default(discord_webhooks.default) }}"
+    discord_webhook: "{{ discord_webhooks[webhook_key | default('apilog')] | default(discord_webhooks.default) }}"
     hz_outbound_ports_range: "{{ cluster_ports_range | default('34000-34500') }}"
     hz_ec2:
       tag_key: "cluster_name"
