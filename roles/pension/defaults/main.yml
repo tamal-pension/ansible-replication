@@ -35,7 +35,7 @@ app_configurations:
   protected_users_list: "{{ app_admin_tamal_excluded_users }}"
 
   destination-base-path: "s3:///"
-  files-path: "/replication-{{ environment_name }}/rep-files"
+  files-path: "/replication-{{ environment_name }}/{{ replication_folder | default('rep-files') }}"
   store_files_as_avro: true
   reload_folder_bulk_size: 50
   reload_index_recipients: "manager@{{ app_public_domain }}"
@@ -63,7 +63,7 @@ app_configurations:
 
   events:
     destination-base-path: "s3:///"
-    files-path: "/replication-{{ environment_name }}/rep-files"
+    files-path: "/replication-{{ environment_name }}/{{ replication_folder | default('rep-files') }}"
 
   events_bulk_size: 1000
 

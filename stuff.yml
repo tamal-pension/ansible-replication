@@ -17,6 +17,7 @@
       cluster_name: "cluster_name"
       cluster_ports_range: "cluster_ports_range"
       webhook_key: "webhook_key"
+      replication_folder: "replication_folder"
 
 - name: Java role
   ansible.builtin.include_role:

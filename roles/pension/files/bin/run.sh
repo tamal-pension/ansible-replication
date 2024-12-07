@@ -73,5 +73,4 @@ java \
   -classpath "$LIB_DIR/*:$JAR:lib" \
   io.vertx.core.Launcher run com.tamal.pension.replication.MainServiceVerticle \
   -options "$OPTIONS" \
-  -conf "$CONF" \
-  -cluster
+  -conf "$CONF"

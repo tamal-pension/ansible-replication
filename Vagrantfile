@@ -60,7 +60,8 @@ Vagrant.configure("2") do |config|
       private_dns: "pension-replication-test-#{Etc.getpwuid(Process.uid).name}",
       replication_active: "false",
       cluster_name: "pension-replication-v2-test",
-      webhook_key: "replicationlog"
+      webhook_key: "replicationlog",
+      replication_folder: "rep-files"
     }
   end
 end
