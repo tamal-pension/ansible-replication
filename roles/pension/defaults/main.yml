@@ -75,7 +75,7 @@ app_configurations:
       password: "{{ app_dao_elasticindexer.password }}"
 
     queue:
-      bootstrap.servers: "kafka1.{{ private_domain }}:9092;kafka2.{{ private_domain }}:9092;kafka3.{{ private_domain }}:9092"
+      bootstrap.servers: "kafka1.{{ private_domain }}:9092,kafka2.{{ private_domain }}:9092,kafka3.{{ private_domain }}:9092"
 
     hosts:
       - "http://elastic-master1.{{ private_domain }}:9200"
